@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def fetch_medal_tally(df, year, country):
     medal_df = df.drop_duplicates(subset=['Team', 'NOC', 'Games', 'Year', 'City', 'Sport', 'Event', 'Medal'])
     flag = 0
@@ -29,7 +28,6 @@ def fetch_medal_tally(df, year, country):
 
     return x
 
-
 def country_year_list(df):
     years = df['Year'].unique().tolist()
     years.sort()
@@ -42,11 +40,11 @@ def country_year_list(df):
     return years,country
 
 def data_over_time(df,col):
-
-    nations_over_time = df.drop_duplicates(['Year', col])['Year'].value_counts().reset_index().sort_values('index')
-    nations_over_time.rename(columns={'index': 'Edition', 'Year': col}, inplace=True)
+    # Fixed version - explicitly handle column names
+    year_counts = df.drop_duplicates(['Year', col])['Year'].value_counts().sort_index()
+    nations_over_time = year_counts.reset_index()
+    nations_over_time.columns = ['Edition', col]
     return nations_over_time
-
 
 def most_successful(df, sport):
     temp_df = df.dropna(subset=['Medal'])
@@ -54,9 +52,12 @@ def most_successful(df, sport):
     if sport != 'Overall':
         temp_df = temp_df[temp_df['Sport'] == sport]
 
-    x = temp_df['Name'].value_counts().reset_index().head(15).merge(df, left_on='index', right_on='Name', how='left')[
-        ['index', 'Name_x', 'Sport', 'region']].drop_duplicates('index')
-    x.rename(columns={'index': 'Name', 'Name_x': 'Medals'}, inplace=True)
+    # Fixed version - explicitly handle column names
+    name_counts = temp_df['Name'].value_counts().reset_index().head(15)
+    name_counts.columns = ['Name', 'count']
+    x = name_counts.merge(df, left_on='Name', right_on='Name', how='left')[
+        ['Name', 'count', 'Sport', 'region']].drop_duplicates('Name')
+    x.rename(columns={'count': 'Medals'}, inplace=True)
     return x
 
 def yearwise_medal_tally(df,country):
@@ -77,15 +78,16 @@ def country_event_heatmap(df,country):
     pt = new_df.pivot_table(index='Sport', columns='Year', values='Medal', aggfunc='count').fillna(0)
     return pt
 
-
 def most_successful_countrywise(df, country):
     temp_df = df.dropna(subset=['Medal'])
-
     temp_df = temp_df[temp_df['region'] == country]
 
-    x = temp_df['Name'].value_counts().reset_index().head(10).merge(df, left_on='index', right_on='Name', how='left')[
-        ['index', 'Name_x', 'Sport']].drop_duplicates('index')
-    x.rename(columns={'index': 'Name', 'Name_x': 'Medals'}, inplace=True)
+    # Fixed version - explicitly handle column names
+    name_counts = temp_df['Name'].value_counts().reset_index().head(10)
+    name_counts.columns = ['Name', 'count']
+    x = name_counts.merge(df, left_on='Name', right_on='Name', how='left')[
+        ['Name', 'count', 'Sport']].drop_duplicates('Name')
+    x.rename(columns={'count': 'Medals'}, inplace=True)
     return x
 
 def weight_v_height(df,sport):
