@@ -45,7 +45,7 @@ if user_menu == 'Overall Analysis':
     nations = df['region'].unique().shape[0]
 
     st.title("Top Statistics")
-    col1,col2,col3 = st.beta_columns(3)
+    col1,col2,col3 = st.columns(3)
     with col1:
         st.header("Editions")
         st.title(editions)
@@ -172,6 +172,7 @@ if user_menu == 'Athlete wise Analysis':
     fig = px.line(final, x="Year", y=["Male", "Female"])
     fig.update_layout(autosize=False, width=1000, height=600)
     st.plotly_chart(fig)
+
 
 
 
